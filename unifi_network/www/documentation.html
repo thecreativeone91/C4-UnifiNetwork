@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>UniFi Network (Open Source)</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.5;margin:24px;max-width:46em;color:#222}
+h1{font-size:1.5em}h2{font-size:1.15em;margin-top:1.6em;border-bottom:1px solid #ddd}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:4px 8px;text-align:left;vertical-align:top}
+.note{background:#fff8e1;border-left:4px solid #f0b400;padding:8px 12px}
+</style></head>
+<body>
+<h1>UniFi Network (Open Source)</h1>
+<p>Master driver for a UniFi Network console (Cloud Gateway, UDM, UCG, UniFi OS Server, Cloud Key, or the self-hosted Network application). It reads your PDUs and PoE switches from the UniFi Network API and serves two child drivers bound to its <b>UniFi Network</b> connection:</p>
+<ul>
+<li><b>UniFi PDU Outlet</b> &ndash; one outlet of a UniFi SmartPower PDU, strip or plug: on, off, toggle, power cycle.</li>
+<li><b>UniFi PoE Port</b> &ndash; PoE power on one switch or gateway port: on, off, toggle, power cycle.</li>
+</ul>
+
+<h2>On the UniFi console</h2>
+<ol>
+<li><b>API key</b> (UniFi OS consoles and UniFi OS Server): UniFi Network &rarr; Settings &rarr; Control Plane &rarr; Integrations (called <i>API Keys</i> on some versions) &rarr; create a key and copy it.</li>
+<li><b>Local account</b> (needed for the self-hosted Network application, and on consoles whose classic API refuses the API key &ndash; the <b>Status</b> property tells you): create a local-only admin with Network admin rights (Site Admin or Full Management), remote access off, no MFA.</li>
+<li>Give the console a fixed address.</li>
+</ol>
+
+<h2>Composer setup</h2>
+<ol>
+<li>Add this driver. Set <b>Controller Address</b> and either <b>API Key</b>, <b>Username</b>/<b>Password</b>, or both.</li>
+<li>Run the <b>Test Connection</b> action. <b>Status</b> should read <i>Connected</i> and the device counts should fill in.</li>
+<li>Add one <b>UniFi PDU Outlet</b> or <b>UniFi PoE Port</b> driver per outlet or port you want to control.</li>
+<li>Connections &rarr; Control: bind each child's <b>UniFi Network</b> connection to this driver's <b>UniFi Network</b> connection.</li>
+<li>In each child, choose the <b>UniFi Device</b>, then the <b>Outlet</b> or <b>PoE Port</b>.</li>
+</ol>
+
+<h2>How it talks to UniFi</h2>
+<table>
+<tr><th>Task</th><th>API</th></tr>
+<tr><td>Network version, site, device ids</td><td>Official Network API (<code>/proxy/network/integration/v1</code>, API key)</td></tr>
+<tr><td>PoE port power cycle (switch side)</td><td>Official API <code>POWER_CYCLE</code> port action; falls back to the classic <code>cmd/devmgr power-cycle</code></td></tr>
+<tr><td>Port and outlet state, PoE on/off, outlet on/off</td><td>Classic controller API (<code>stat/device</code>, <code>rest/device</code> port_overrides / outlet_overrides). The official API has no on/off for these yet.</td></tr>
+</table>
+<p>Classic requests use the local account when a <b>Username</b> is set, otherwise the API key. Every on/off write re-reads the device first and writes back the complete override array, so other ports and outlets keep their profiles, names and states. Writes are sent one at a time.</p>
+
+<h2>Properties</h2>
+<table>
+<tr><th>Property</th><th>Default</th><th>Notes</th></tr>
+<tr><td>Controller Type</td><td>UniFi OS Console</td><td>Use <i>Self-Hosted Network Application</i> for the Java controller on Windows/Linux (local account only, no API key, no official API).</td></tr>
+<tr><td>Controller Address / Port</td><td>&ndash; / 443</td><td>Self-hosted controllers usually use 8443; UniFi OS Server 11443.</td></tr>
+<tr><td>API Key</td><td></td><td>UniFi OS only.</td></tr>
+<tr><td>Username / Password</td><td></td><td>Optional local account for the classic API.</td></tr>
+<tr><td>Site</td><td>default</td><td>Internal site name (as in <code>/manage/site/<i>name</i></code>), the site's display name, or its id.</td></tr>
+<tr><td>Verify SSL Certificate</td><td>No</td><td>Consoles use a self-signed certificate by default.</td></tr>
+<tr><td>Poll Interval (seconds)</td><td>10</td><td>Only devices used by a child are polled at this rate; a full device scan runs every 5 minutes.</td></tr>
+<tr><td>Protect Uplink Ports</td><td>Yes</td><td>Refuses PoE off and power cycle on a switch's uplink port, so a PoE-powered switch cannot cut itself off.</td></tr>
+<tr><td>Debug Mode</td><td>Off</td><td></td></tr>
+</table>
+<p>Read-only: Driver Version, Status, Network Application, Official API, Site ID, PDU Devices Found, PoE Switches Found, Linked Drivers.</p>
+
+<h2>Programming</h2>
+<ul>
+<li>Events: <code>Connected</code>, <code>Connection Lost</code></li>
+<li>Command: <code>Refresh Devices</code></li>
+<li>Actions: Test Connection, Refresh Devices, Log Device List (writes every PDU outlet and PoE port to the Lua output)</li>
+</ul>
+
+<h2>Troubleshooting</h2>
+<table>
+<tr><th>Status</th><th>Fix</th></tr>
+<tr><td>the console rejected the API key on the classic API</td><td>Add a local Username and Password.</td></tr>
+<tr><td>login rejected</td><td>Use a local-only account without MFA; check the password.</td></tr>
+<tr><td>login rate-limited</td><td>Wait a few minutes; the console throttles repeated failed logins.</td></tr>
+<tr><td>cannot reach controller</td><td>Check address and port; the controller must reach the console over HTTPS.</td></tr>
+<tr><td>site not found</td><td>Set <b>Site</b> to the internal site name (see the URL in the UniFi web UI).</td></tr>
+</table>
+
+<p class="note">Changing PoE or an outlet makes the console re-provision that device; the new state shows within a few seconds. Turning PoE off on a port that feeds this console, the Control4 controller or a switch upstream of them will cut your own control path &ndash; leave those ports out.</p>
+
+<p>Open Source &middot; MIT License &middot; Not affiliated with or endorsed by Ubiquiti Inc. UniFi is a trademark of Ubiquiti Inc.</p>
+</body>
+</html>
