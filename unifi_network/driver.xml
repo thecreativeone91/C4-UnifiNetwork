@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devicedata>
+  <copyright>Open Source (MIT License)</copyright>
+  <creator>Open Source</creator>
+  <manufacturer>Ubiquiti</manufacturer>
+  <name>UniFi Network</name>
+  <model>UniFi Network (Open Source)</model>
+  <created>10/18/2026 12:00 PM</created>
+  <modified>10/18/2026 12:00 PM</modified>
+  <version>101</version>
+  <control>lua_gen</control>
+  <controlmethod>ip</controlmethod>
+  <driver>DriverWorks</driver>
+  <minimum_os_version>3.0.0</minimum_os_version>
+  <small image_source="c4z">icons/device_sm.png</small>
+  <large image_source="c4z">icons/device_lg.png</large>
+
+  <connections>
+    <!-- Bind every UniFi PDU Outlet and UniFi PoE Port driver to this connection. -->
+    <connection>
+      <id>1</id>
+      <facing>6</facing>
+      <type>1</type>
+      <connectionname>UniFi Network</connectionname>
+      <consumer>False</consumer>
+      <linelevel>False</linelevel>
+      <classes>
+        <class><classname>UNIFI_NETWORK_LINK</classname></class>
+      </classes>
+    </connection>
+  </connections>
+
+  <config>
+    <documentation file="www/documentation.html"/>
+    <script file="driver.lua"/>
+    <actions>
+      <action><name>Test Connection</name><command>Test Connection</command></action>
+      <action><name>Refresh Devices</name><command>Refresh Devices</command></action>
+      <action><name>Log Device List</name><command>Log Device List</command></action>
+    </actions>
+    <events>
+      <event><id>1</id><name>Connected</name><description>The driver reached the UniFi Network console</description></event>
+      <event><id>2</id><name>Connection Lost</name><description>The UniFi Network console stopped answering or rejected the credentials</description></event>
+    </events>
+    <commands>
+      <command>
+        <name>Refresh Devices</name>
+        <description>UniFi Network: re-read all devices</description>
+      </command>
+    </commands>
+    <properties>
+      <property>
+        <name>Driver Version</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Status</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Network Application</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Official API</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Site ID</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>PDU Devices Found</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>PoE Switches Found</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Linked Drivers</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Controller Type</name>
+        <type>LIST</type>
+        <default>UniFi OS Console</default>
+        <items>
+          <item>UniFi OS Console</item>
+          <item>Self-Hosted Network Application</item>
+        </items>
+      </property>
+      <property>
+        <name>Controller Address</name>
+        <type>STRING</type>
+        <default></default>
+      </property>
+      <property>
+        <name>Controller Port</name>
+        <type>RANGED_INTEGER</type>
+        <minimum>1</minimum>
+        <maximum>65535</maximum>
+        <default>443</default>
+      </property>
+      <property>
+        <name>API Key</name>
+        <type>STRING</type>
+        <password>true</password>
+        <default></default>
+      </property>
+      <property>
+        <name>Username</name>
+        <type>STRING</type>
+        <default></default>
+      </property>
+      <property>
+        <name>Password</name>
+        <type>STRING</type>
+        <password>true</password>
+        <default></default>
+      </property>
+      <property>
+        <name>Site</name>
+        <type>STRING</type>
+        <default>default</default>
+      </property>
+      <property>
+        <name>Verify SSL Certificate</name>
+        <type>LIST</type>
+        <default>No</default>
+        <items>
+          <item>No</item>
+          <item>Yes</item>
+        </items>
+      </property>
+      <property>
+        <name>Poll Interval (seconds)</name>
+        <type>RANGED_INTEGER</type>
+        <minimum>5</minimum>
+        <maximum>300</maximum>
+        <default>10</default>
+      </property>
+      <property>
+        <name>Protect Uplink Ports</name>
+        <type>LIST</type>
+        <default>Yes</default>
+        <items>
+          <item>Yes</item>
+          <item>No</item>
+        </items>
+      </property>
+      <property>
+        <name>Debug Mode</name>
+        <type>LIST</type>
+        <default>Off</default>
+        <items>
+          <item>Off</item>
+          <item>On</item>
+        </items>
+      </property>
+    </properties>
+  </config>
+
+  <!--
+    Combo self-proxy: the driver is its own proxy, named after the .c4z file.
+    Without a proxy Composer does not list the driver in its search.
+  -->
+  <combo>true</combo>
+  <proxies>
+    <proxy name="UniFi Network">unifi_network</proxy>
+  </proxies>
+</devicedata>
