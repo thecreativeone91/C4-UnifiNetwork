@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>@NAME@ (Open Source)</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.5;margin:24px;max-width:46em;color:#222}
+h1{font-size:1.5em}h2{font-size:1.15em;margin-top:1.6em;border-bottom:1px solid #ddd}
+code{background:#f3f3f3;padding:1px 4px;border-radius:3px}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:4px 8px;text-align:left;vertical-align:top}
+.note{background:#fff8e1;border-left:4px solid #f0b400;padding:8px 12px}
+</style></head>
+<body>
+<h1>@NAME@ (Open Source)</h1>
+<p>@INTRO@ It works through the <b>UniFi Network</b> driver, which must be in the project and connected.</p>
+
+<h2>Setup</h2>
+<ol>
+<li>Connections &rarr; Control: bind this driver's <b>UniFi Network</b> connection to the UniFi Network driver.</li>
+<li>Pick the <b>UniFi Device</b>. The list fills in once the UniFi Network driver is connected.</li>
+<li>Pick the <b>@ITEM@</b>. <b>Status</b> reads <i>OK</i> when the driver is tracking it.</li>
+<li>Optional: bind <b>Power Relay</b> to a Control4 relay-type driver to get Navigator/keypad control, and <b>Power State Contact</b> to a contact driver to show the power state.</li>
+</ol>
+
+<h2>Properties</h2>
+<table>
+<tr><th>Property</th><th>Notes</th></tr>
+<tr><td>UniFi Device / @ITEM@</td><td>What this driver controls. Names come from UniFi; commas are dropped from list entries.</td></tr>
+@PROPS@
+<tr><td>Power Cycle Off Time (seconds)</td><td>How long power stays off during @CYCLE_WHEN@.</td></tr>
+<tr><td>Debug Mode</td><td>Extra Lua output.</td></tr>
+</table>
+<p>Read-only: Driver Version, Status, @RO@, Device Status, Power State, Power Draw, Last Error.</p>
+
+<h2>Programming</h2>
+<ul>
+<li>Commands: <code>Power On</code>, <code>Power Off</code>, <code>Toggle Power</code>, <code>Power Cycle</code></li>
+<li>Events: <code>Power Turned On</code>, <code>Power Turned Off</code> (also when changed in the UniFi app), <code>Power Cycle Started</code>, <code>Power Cycle Complete</code>, <code>Command Failed</code>, <code>Device Online</code>, <code>Device Offline</code></li>
+<li>Variables: <code>POWER_STATE</code> (bool), <code>POWER_WATTS</code>, <code>DEVICE_ONLINE</code> (bool) &ndash; usable in conditionals</li>
+<li>Actions: Power On, Power Off, Toggle Power, Power Cycle, Refresh</li>
+</ul>
+
+<h2>Connections</h2>
+<table>
+<tr><th>Connection</th><th>Behavior</th></tr>
+<tr><td>UniFi Network (control, consumer)</td><td>Link to the master driver.</td></tr>
+<tr><td>Power Relay (RELAY)</td><td>CLOSE = power on, OPEN = power off, TOGGLE = toggle, TRIGGER = power cycle. Reports CLOSED while powered.</td></tr>
+<tr><td>Power State Contact (CONTACT_SENSOR)</td><td>Closed while powered, open while off.</td></tr>
+</table>
+
+@EXTRA@
+
+<p>Open Source &middot; MIT License &middot; Not affiliated with or endorsed by Ubiquiti Inc.</p>
+</body>
+</html>
