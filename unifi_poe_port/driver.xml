@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devicedata>
+  <copyright>Open Source (MIT License)</copyright>
+  <creator>Open Source</creator>
+  <manufacturer>Ubiquiti</manufacturer>
+  <name>UniFi PoE Port</name>
+  <model>UniFi PoE Port (Open Source)</model>
+  <created>10/18/2026 12:00 PM</created>
+  <modified>10/18/2026 12:00 PM</modified>
+  <version>101</version>
+  <control>lua_gen</control>
+  <controlmethod>ip</controlmethod>
+  <driver>DriverWorks</driver>
+  <minimum_os_version>3.0.0</minimum_os_version>
+  <small image_source="c4z">icons/device_sm.png</small>
+  <large image_source="c4z">icons/device_lg.png</large>
+
+  <connections>
+    <!-- Bind to the UniFi Network driver. -->
+    <connection>
+      <id>1</id>
+      <facing>6</facing>
+      <type>1</type>
+      <connectionname>UniFi Network</connectionname>
+      <consumer>True</consumer>
+      <linelevel>False</linelevel>
+      <classes>
+        <class><classname>UNIFI_NETWORK_LINK</classname></class>
+      </classes>
+    </connection>
+    <!-- Optional: CLOSE = power on, OPEN = power off, TOGGLE, TRIGGER = power cycle. -->
+    <connection>
+      <id>2</id>
+      <facing>6</facing>
+      <type>1</type>
+      <connectionname>Power Relay</connectionname>
+      <consumer>False</consumer>
+      <linelevel>False</linelevel>
+      <classes>
+        <class><classname>RELAY</classname></class>
+      </classes>
+    </connection>
+    <!-- Optional: closed while the PoE port is powered. -->
+    <connection>
+      <id>3</id>
+      <facing>6</facing>
+      <type>1</type>
+      <connectionname>Power State Contact</connectionname>
+      <consumer>False</consumer>
+      <linelevel>False</linelevel>
+      <classes>
+        <class><classname>CONTACT_SENSOR</classname></class>
+      </classes>
+    </connection>
+  </connections>
+
+  <config>
+    <documentation file="www/documentation.html"/>
+    <script file="driver.lua"/>
+    <actions>
+      <action><name>Power On</name><command>Power On</command></action>
+      <action><name>Power Off</name><command>Power Off</command></action>
+      <action><name>Toggle Power</name><command>Toggle Power</command></action>
+      <action><name>Power Cycle</name><command>Power Cycle</command></action>
+      <action><name>Refresh</name><command>Refresh</command></action>
+    </actions>
+    <events>
+      <event><id>1</id><name>Power Turned On</name><description>Power came on (by Control4, the UniFi app or anything else)</description></event>
+      <event><id>2</id><name>Power Turned Off</name><description>Power went off</description></event>
+      <event><id>3</id><name>Power Cycle Started</name><description>A power cycle was requested</description></event>
+      <event><id>4</id><name>Power Cycle Complete</name><description>A power cycle finished</description></event>
+      <event><id>5</id><name>Command Failed</name><description>A power command was refused or failed; see the Last Error property</description></event>
+      <event><id>6</id><name>Device Online</name><description>The UniFi device came back online</description></event>
+      <event><id>7</id><name>Device Offline</name><description>The UniFi device went offline</description></event>
+    </events>
+    <commands>
+      <command>
+        <name>Power On</name>
+        <description>UniFi PoE: power on</description>
+      </command>
+      <command>
+        <name>Power Off</name>
+        <description>UniFi PoE: power off</description>
+      </command>
+      <command>
+        <name>Toggle Power</name>
+        <description>UniFi PoE: toggle power</description>
+      </command>
+      <command>
+        <name>Power Cycle</name>
+        <description>UniFi PoE: power cycle</description>
+      </command>
+    </commands>
+    <properties>
+      <property>
+        <name>Driver Version</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Status</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>UniFi Device</name>
+        <type>DYNAMIC_LIST</type>
+        <readonly>false</readonly>
+      </property>
+      <property>
+        <name>PoE Port</name>
+        <type>DYNAMIC_LIST</type>
+        <readonly>false</readonly>
+      </property>
+      <property>
+        <name>Port Name</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Device Status</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Power State</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Power Draw</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>PoE Mode</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>PoE Delivering Power</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Link</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Uplink Port</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Power Cycle Method</name>
+        <type>LIST</type>
+        <default>Switch Power Cycle</default>
+        <items>
+          <item>Switch Power Cycle</item>
+          <item>Off Then On</item>
+        </items>
+      </property>
+      <property>
+        <name>Power Cycle Off Time (seconds)</name>
+        <type>RANGED_INTEGER</type>
+        <minimum>1</minimum>
+        <maximum>300</maximum>
+        <default>10</default>
+      </property>
+      <property>
+        <name>Last Error</name>
+        <type>STRING</type>
+        <readonly>true</readonly>
+        <default></default>
+      </property>
+      <property>
+        <name>Debug Mode</name>
+        <type>LIST</type>
+        <default>Off</default>
+        <items>
+          <item>Off</item>
+          <item>On</item>
+        </items>
+      </property>
+    </properties>
+  </config>
+
+  <!--
+    Combo self-proxy: the driver is its own proxy, named after the .c4z file.
+    Without a proxy Composer does not list the driver in its search.
+  -->
+  <combo>true</combo>
+  <proxies>
+    <proxy name="UniFi PoE Port">unifi_poe_port</proxy>
+  </proxies>
+</devicedata>
